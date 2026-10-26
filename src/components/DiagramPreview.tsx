@@ -17,7 +17,7 @@ export function diagramSvg(data: DiagramData) {
     const shape = n.data.shape === 'actor' ? `<circle cx="${x + 75}" cy="${y}" r="8"/><path d="M${x + 75} ${y + 8}v32m-17-20h34m-17 20-15 19m15-19 15 19"/>` : n.data.shape === 'usecase' ? `<ellipse cx="${x + 75}" cy="${y + 30}" rx="75" ry="24"/>` : `<rect x="${x}" y="${y + 12}" width="150" height="36" rx="5"/>`;
     return `<g fill="${n.data.shape === 'actor' ? 'none' : 'var(--card)'}" stroke="currentColor">${shape}</g><text x="${x + 75}" y="${y + (n.data.shape === 'actor' ? 77 : 34)}" text-anchor="middle" fill="currentColor" font-family="sans-serif" font-size="12">${escape(n.data.label)}</text>`;
   }).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" style="--card:oklch(0.2 0.014 160)" viewBox="${minX} ${minY} ${width} ${height}" role="img">${lines}${shapes}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${width} ${height}" role="img">${lines}${shapes}</svg>`;
 }
 export function DiagramPreview({ data }: { data: DiagramData }) {
   return <div className="diagram-preview w-full text-muted-foreground" dangerouslySetInnerHTML={{ __html: diagramSvg(data) }} />;

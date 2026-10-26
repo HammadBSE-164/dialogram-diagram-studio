@@ -17,7 +17,9 @@ function UmlNode({ data, selected }: NodeProps<DiagramNode>) {
 }
 const nodeTypes = { uml: UmlNode };
 export function downloadDiagram(data: DiagramData) {
-  const url = URL.createObjectURL(new Blob([diagramSvg(data)], { type: 'image/svg+xml' }));
+  const theme = getComputedStyle(document.documentElement);
+  const svg = diagramSvg(data).replace('<svg ', `<svg style="--card:${theme.getPropertyValue('--card').trim()};color:${theme.getPropertyValue('--muted-foreground').trim()}" `);
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
   const a = document.createElement('a'); a.href = url; a.download = 'dialogram-diagram.svg'; a.click(); URL.revokeObjectURL(url);
 }
 
