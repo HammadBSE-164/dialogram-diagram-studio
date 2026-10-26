@@ -38,7 +38,7 @@ function Landing() {
           <span className="font-serif text-2xl font-semibold">Dialogram</span>
         </Link>
         <nav className="hidden gap-8 text-sm text-muted-foreground md:flex">
-          {[["How it works", "how"], ["Features", "features"], ["Pricing", "pricing"], ["FAQ", "faq"]].map(([l, id]) => (
+          {([["How it works", "how"], ["Features", "features"], ["Pricing", "pricing"], ["FAQ", "faq"]] as const).map(([l, id]) => (
             <button key={id} onClick={() => scroll(id)} className="transition-colors hover:text-foreground">{l}</button>
           ))}
         </nav>

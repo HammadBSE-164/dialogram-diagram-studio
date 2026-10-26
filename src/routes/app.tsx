@@ -40,7 +40,7 @@ function Workspace() {
     setProjects([p, ...projects]); setActive(p.id); setText("");
   };
   const submit = () => {
-    if (!text.trim()) return toast.error("Paste a transcript first");
+    if (!text.trim()) { toast.error("Paste a transcript first"); return; }
     toast.success(`Generating ${out} in ${lang}…`);
   };
 
