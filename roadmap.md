@@ -1,4 +1,4 @@
 # Tasks
-- [ ] Add screenshot-matched results page connected to transcript submission.
-- [ ] Add working selected-diagram editor with saved changes and exports.
-- [ ] Verify navigation and editing flow.
+- [x] Add screenshot-matched results page connected to transcript submission (sample results; no AI conversion).
+- [x] Add working selected-diagram editor with session edits and SVG exports.
+- [x] Verify navigation and editing flow.

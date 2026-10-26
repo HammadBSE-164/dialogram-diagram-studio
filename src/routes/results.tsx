@@ -48,7 +48,7 @@ function Results() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">12</span><p className="text-[11px] text-muted-foreground">User stories</p></div>
           <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">6</span><p className="text-[11px] text-muted-foreground">Actors</p></div>
-          <Button variant="secondary" className="h-auto flex-col items-start gap-0 border border-primary/40 bg-accent px-3 py-2" onClick={() => setView('attention')}><span className="font-serif text-xl">2</span><span className="text-[11px] text-muted-foreground">Need your attention</span></Button>
+          <Button variant="secondary" className="h-auto flex-col items-start gap-0 whitespace-normal border border-primary/40 bg-accent px-3 py-2 text-left" onClick={() => setView('attention')}><span className="font-serif text-xl">2</span><span className="text-[11px] text-muted-foreground">Need your attention</span></Button>
         </div>
         <section className="mt-4 rounded-lg border border-primary/50 bg-card px-3 py-3">
           <Button variant="ghost" className="h-auto w-full justify-start p-0 hover:bg-transparent" onClick={() => setExpanded(!expanded)}><FileText className="self-start text-muted-foreground" /><span className="text-left"><span className="block text-xs font-semibold">User Stories</span><span className="block text-[10px] font-normal text-muted-foreground">The key things users want to do.</span></span><span className="ml-auto text-[10px] font-normal text-muted-foreground">{expanded ? 'Collapse' : 'Click to expand'}</span><ChevronRight /></Button>

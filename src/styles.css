@@ -66,7 +66,7 @@
 }
 
 .diagram-preview svg { display: block; width: 100%; height: auto; max-height: 200px; }
-.class-preview svg { max-height: 60px; }
+.class-preview svg { max-height: 180px; }
 .diagram-editor .react-flow {
   --xy-background-color: var(--background);
   --xy-edge-stroke: var(--muted-foreground);

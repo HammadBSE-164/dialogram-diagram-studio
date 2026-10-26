@@ -3,8 +3,8 @@ import type { DiagramData } from '@/lib/diagram-data';
 export function diagramSvg(data: DiagramData) {
   const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c] ?? c));
   const xs = data.nodes.map(n => n.position.x), ys = data.nodes.map(n => n.position.y);
-  const minX = Math.min(0, ...xs) - 20, minY = Math.min(0, ...ys) - 10;
-  const width = Math.max(900, ...xs.map(x => x + 180)) - minX, height = Math.max(140, ...ys.map(y => y + 100)) - minY;
+  const minX = Math.min(0, ...xs) - 20, minY = (ys.length ? Math.min(...ys) : 0) - 10;
+  const width = Math.max(900, ...xs.map(x => x + 180)) - minX, height = Math.max(minY + 70, ...ys.map(y => y + (data.nodes.find(n => n.position.y === y)?.data.shape === 'actor' ? 90 : 65))) - minY;
   const lines = data.edges.map(e => {
     const a = data.nodes.find(n => n.id === e.source), b = data.nodes.find(n => n.id === e.target);
     if (!a || !b) return '';
