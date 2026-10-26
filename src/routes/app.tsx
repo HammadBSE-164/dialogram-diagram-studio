@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { Plus, Search, FileText, Paperclip, Mic, ChevronDown, ArrowRight, UploadCloud, Link2, Scan, UserCircle2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { LogoMark } from "@/components/Logo";
+import { useProject } from "@/components/ProjectContext";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -26,6 +28,8 @@ CLIENT 00:42 It should be fast, reliable and easy to use especially during busy 
 type Project = { id: number; name: string; time: string; text: string };
 
 function Workspace() {
+  const navigate = useNavigate();
+  const { setTranscript } = useProject();
   const [projects, setProjects] = useState<Project[]>([{ id: 1, name: "Campus Food Delivery - Interview 2", time: "2:14 PM", text: SAMPLE }]);
   const [active, setActive] = useState<number | null>(1);
   const [q, setQ] = useState("");
@@ -41,7 +45,8 @@ function Workspace() {
   };
   const submit = () => {
     if (!text.trim()) { toast.error("Paste a transcript first"); return; }
-    toast.success(`Generating ${out} in ${lang}…`);
+    setTranscript(text);
+    navigate({ to: '/results' });
   };
 
   const ghost = "inline-flex items-center gap-2 rounded border border-border px-4 py-2 text-sm hover:bg-accent";
@@ -85,7 +90,7 @@ function Workspace() {
             <button onClick={() => { setRec(!rec); toast(rec ? "Recording stopped" : "Listening…"); }} className={`rounded-full border p-2 ${rec ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-accent"}`}><Mic className="h-4 w-4" /></button>
             <Select label="Language" value={lang} options={["English", "Urdu"]} onChange={setLang} />
             <Select label="Output" value={out} options={["Stories - Use Case", "Stories - Class", "Use Case Only", "Class Only"]} onChange={setOut} />
-            <button onClick={submit} className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-primary/90"><ArrowRight className="h-4 w-4" /></button>
+            <Button onClick={submit} aria-label="Convert transcript" size="icon" className="rounded-full"><ArrowRight className="h-4 w-4" /></Button>
           </div>
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
