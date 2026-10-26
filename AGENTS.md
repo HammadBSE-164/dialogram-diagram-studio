@@ -11,3 +11,4 @@
 
 - Keep prototype transcript and diagram edits in a shared React provider so navigation preserves edits without implying account-based persistence.
 - Use React Flow for visual diagram editing and the shared node/edge model for read-only SVG previews and exports so saved edits stay consistent.
+- Compute preview/export connection endpoints with shared shape-boundary geometry so relationships never cross endpoint labels.
