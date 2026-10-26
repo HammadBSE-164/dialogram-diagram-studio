@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep prototype transcript and diagram edits in a shared React provider so navigation preserves edits without implying account-based persistence.
+- Use React Flow for visual diagram editing and the shared node/edge model for read-only SVG previews and exports so saved edits stay consistent.

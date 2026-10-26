@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@xyflow/react/dist/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -62,6 +63,43 @@
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+}
+
+.diagram-preview svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.class-preview svg { max-height: 180px; }
+.diagram-editor .react-flow {
+  --xy-background-color: var(--background);
+  --xy-edge-stroke: var(--muted-foreground);
+  --xy-edge-stroke-selected: var(--primary);
+  --xy-connectionline-stroke: var(--primary);
+  --xy-handle-background-color: var(--primary);
+  --xy-handle-border-color: var(--background);
+  --xy-controls-button-background-color: var(--card);
+  --xy-controls-button-background-color-hover: var(--accent);
+  --xy-controls-button-color: var(--foreground);
+  --xy-controls-button-border-color: var(--border);
+  --xy-edge-label-background-color: var(--card);
+  --xy-edge-label-color: var(--foreground);
+  --xy-background-pattern-dots-color: var(--border);
+}
+.uml-node { width: 150px; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--muted-foreground); background: var(--card); color: var(--foreground); padding: 10px 14px; text-align: center; font-size: 12px; overflow-wrap: anywhere; }
+.uml-usecase { border-radius: 50%; }
+.uml-class { border-radius: 5px; }
+.uml-actor { border-color: transparent; background: transparent; width: 100px; }
+.uml-selected { outline: 2px solid var(--primary); outline-offset: 3px; }
+@media (max-width: 800px) {
+  .results-sidebar { width: 190px; padding: 14px; }
+  .results-content { padding-left: 18px; padding-right: 18px; }
+  .results-bot { display: none; }
+}
+@media (max-width: 600px) {
+  .results-layout { display: block; }
+  .results-sidebar { width: 100%; flex-direction: row; align-items: center; gap: 12px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .results-sidebar > :not(a):not(.mt-6) { display: none; }
+  .results-sidebar > .mt-6 { margin-top: 0; margin-left: auto; width: auto; }
+  .editor-body { flex-direction: column; height: 65vh; }
+  .editor-body > aside { width: 100%; border-left: 0; border-top: 1px solid var(--border); padding: 12px; }
+  .editor-body > aside h3, .editor-body > aside p { display: none; }
 }
 
 :root {
