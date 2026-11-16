@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { LogoMark } from "@/components/Logo";
 import { useProject } from "@/components/ProjectContext";
 import { Button } from "@/components/ui/button";
+import { analyzeTranscript } from "@/lib/api";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -29,7 +30,7 @@ type Project = { id: number; name: string; time: string; text: string };
 
 function Workspace() {
   const navigate = useNavigate();
-  const { setTranscript } = useProject();
+  const { setTranscript, setAnalysis } = useProject();
   const [projects, setProjects] = useState<Project[]>([{ id: 1, name: "Campus Food Delivery - Interview 2", time: "2:14 PM", text: SAMPLE }]);
   const [active, setActive] = useState<number | null>(1);
   const [q, setQ] = useState("");
@@ -37,16 +38,26 @@ function Workspace() {
   const [lang, setLang] = useState("English");
   const [out, setOut] = useState("Stories - Use Case");
   const [rec, setRec] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const newProject = () => {
     const p = { id: Date.now(), name: `Untitled project ${projects.length + 1}`, time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }), text: "" };
     setProjects([p, ...projects]); setActive(p.id); setText("");
   };
-  const submit = () => {
+  const submit = async () => {
     if (!text.trim()) { toast.error("Paste a transcript first"); return; }
-    setTranscript(text);
-    navigate({ to: '/results' });
+    setSubmitting(true);
+    try {
+      const analysis = await analyzeTranscript(text, lang, out);
+      setTranscript(text);
+      setAnalysis(analysis);
+      navigate({ to: '/results' });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not analyze transcript");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const ghost = "inline-flex items-center gap-2 rounded border border-border px-4 py-2 text-sm hover:bg-accent";
@@ -90,7 +101,7 @@ function Workspace() {
             <button onClick={() => { setRec(!rec); toast(rec ? "Recording stopped" : "Listening…"); }} className={`rounded-full border p-2 ${rec ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-accent"}`}><Mic className="h-4 w-4" /></button>
             <Select label="Language" value={lang} options={["English", "Urdu"]} onChange={setLang} />
             <Select label="Output" value={out} options={["Stories - Use Case", "Stories - Class", "Use Case Only", "Class Only"]} onChange={setOut} />
-            <Button onClick={submit} aria-label="Convert transcript" size="icon" className="rounded-full"><ArrowRight className="h-4 w-4" /></Button>
+            <Button onClick={submit} disabled={submitting} aria-label="Convert transcript" size="icon" className="rounded-full"><ArrowRight className="h-4 w-4" /></Button>
           </div>
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">

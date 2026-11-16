@@ -21,13 +21,13 @@ export const Route = createFileRoute('/results')({
   component: Results,
 });
 function Results() {
-  const { transcript, diagrams } = useProject();
+  const { transcript, analysis, diagrams } = useProject();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(false);
   const [editor, setEditor] = useState<DiagramKind | null>(null);
   const [view, setView] = useState<DiagramKind | 'transcript' | 'attention' | 'settings' | null>(null);
   const [message, setMessage] = useState('');
-  const [stories, setStories] = useState(sampleStories);
+  const [stories, setStories] = useState(analysis?.stories?.length ? analysis.stories : sampleStories);
   return <div className="results-layout flex min-h-screen bg-background text-foreground">
     <aside className="results-sidebar flex w-60 shrink-0 flex-col border-r border-border bg-sidebar p-5">
       <Link to="/" className="flex items-center gap-3"><LogoMark className="h-9 w-9" /><span className="font-serif text-2xl">Dialogram</span></Link>
@@ -44,11 +44,11 @@ function Results() {
       <header className="flex h-16 items-center gap-3 border-b border-border px-6 text-xs font-medium"><Button asChild variant="ghost" size="icon"><Link to="/app" aria-label="Back to transcript"><ArrowLeft /></Link></Button>Campus Food Delivery - Interview 2</header>
       <div className="results-content mx-auto max-w-[900px] px-8 py-5">
         <Button variant="outline" size="sm" className="rounded-full text-[10px] text-muted-foreground" onClick={() => setView('transcript')}><FileText />Campus Food Delivery Interview<span className="hidden font-mono sm:inline">{transcript ? transcript.split(/[.!?]+/).filter(s => s.trim()).length : 47} sentences · 6 min</span><span className="ml-3 underline">View</span></Button>
-        <div className="relative mt-3"><Bot className="results-bot absolute -left-11 top-1 h-8 w-8 rounded-full border border-border p-1.5 text-muted-foreground" /><h1 className="font-serif text-xl leading-snug">I found 6 people and 12 things your system needs to do.<br />Here's the overview.</h1></div>
+        <div className="relative mt-3"><Bot className="results-bot absolute -left-11 top-1 h-8 w-8 rounded-full border border-border p-1.5 text-muted-foreground" /><h1 className="font-serif text-xl leading-snug">{analysis?.summary || "I found 6 people and 12 things your system needs to do."}<br />Here's the overview.</h1></div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">12</span><p className="text-[11px] text-muted-foreground">User stories</p></div>
-          <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">6</span><p className="text-[11px] text-muted-foreground">Actors</p></div>
-          <Button variant="secondary" className="h-auto flex-col items-start gap-0 whitespace-normal border border-primary/40 bg-accent px-3 py-2 text-left" onClick={() => setView('attention')}><span className="font-serif text-xl">2</span><span className="text-[11px] text-muted-foreground">Need your attention</span></Button>
+          <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">{stories.length}</span><p className="text-[11px] text-muted-foreground">User stories</p></div>
+          <div className="rounded border border-border px-3 py-2"><span className="font-serif text-xl">{analysis?.actor_count ?? 6}</span><p className="text-[11px] text-muted-foreground">Actors</p></div>
+          <Button variant="secondary" className="h-auto flex-col items-start gap-0 whitespace-normal border border-primary/40 bg-accent px-3 py-2 text-left" onClick={() => setView('attention')}><span className="font-serif text-xl">{analysis?.attention.length ?? 2}</span><span className="text-[11px] text-muted-foreground">Need your attention</span></Button>
         </div>
         <section className="mt-4 rounded-lg border border-primary/50 bg-card px-3 py-3">
           <Button variant="ghost" className="h-auto w-full justify-start p-0 hover:bg-transparent" onClick={() => setExpanded(!expanded)}><FileText className="self-start text-muted-foreground" /><span className="text-left"><span className="block text-xs font-semibold">User Stories</span><span className="block text-[10px] font-normal text-muted-foreground">The key things users want to do.</span></span><span className="ml-auto text-[10px] font-normal text-muted-foreground">{expanded ? 'Collapse' : 'Click to expand'}</span><ChevronRight /></Button>
@@ -71,7 +71,7 @@ function Results() {
       <DialogTitle className="font-serif">{view === 'transcript' ? 'Interview transcript' : view === 'attention' ? 'Needs your attention' : view === 'settings' ? 'Settings' : view === 'class' ? 'What the system stores' : 'How people use the system'}</DialogTitle>
       <DialogDescription>Campus Food Delivery — Interview 2</DialogDescription>
       {view === 'transcript' && <p className="max-h-96 overflow-auto whitespace-pre-wrap font-mono text-xs leading-6">{transcript || 'No transcript submitted. These are sample interview results.'}</p>}
-      {view === 'attention' && <ul className="space-y-4 text-sm"><li>1. Confirm whether faculty and staff use the same ordering process as students.</li><li>2. Confirm which payment methods and delivery areas are supported.</li></ul>}
+      {view === 'attention' && <ul className="space-y-4 text-sm">{(analysis?.attention?.length ? analysis.attention : ['Confirm whether faculty and staff use the same ordering process as students.', 'Confirm which payment methods and delivery areas are supported.']).map((item, index) => <li key={index}>{index + 1}. {item}</li>)}</ul>}
       {view === 'settings' && <p className="text-sm text-muted-foreground">Dialogram · Free plan · English</p>}
       {(view === 'class' || view === 'usecase') && <><DiagramPreview data={diagrams[view]} /><div className="flex justify-end gap-2"><Button variant="outline" onClick={() => downloadDiagram(diagrams[view])}><Download />Download SVG</Button><Button onClick={() => { setEditor(view); setView(null); }}><Pencil />Edit diagram</Button></div></>}
     </DialogContent></Dialog>

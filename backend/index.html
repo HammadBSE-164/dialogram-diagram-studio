@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library Q&amp;A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --bg:#E9EEF2; --panel:#fff; --ink:#1B2A41; --muted:#5B6B7F; --line:#D3DBE3;
+  --accent:#2F5D9E; --ok:#1F7A5A; --warn:#9A5B06; --bad:#B3261E;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+aside{background:var(--ink);color:#DCE4EE;padding:24px 20px;display:flex;flex-direction:column;gap:16px}
+aside h1{font:500 22px "Newsreader",serif;margin:0;color:#fff}
+aside p{margin:0;color:#9FB0C5;font-size:13px}
+.drop{border:1.5px dashed #5A7191;border-radius:10px;padding:18px;text-align:center;cursor:pointer;color:#C6D3E3;transition:background .15s}
+.drop:hover,.drop.over{background:#243750}
+.drop:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid #8FB4F0;outline-offset:2px}
+#docs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;overflow:auto}
+#docs li{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#22344D;border-radius:8px;padding:8px 10px;font-size:13px}
+#docs .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#docs small{color:#9FB0C5}
+#docs button{background:none;border:0;color:#9FB0C5;cursor:pointer;font-size:13px}
+#docs button:hover{color:#fff}
+#upmsg{font-size:13px;display:flex;flex-direction:column;gap:4px}
+#upmsg .bad{color:#FFB4AB}#upmsg .ok{color:#9BE0C0}
+main{padding:32px clamp(16px,4vw,48px);max-width:900px;width:100%}
+.ask{display:flex;gap:10px;align-items:flex-end}
+textarea{flex:1;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:inherit;background:var(--panel);color:var(--ink)}
+.go{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 22px;font:600 15px inherit;font-family:inherit;cursor:pointer}
+.go:disabled{opacity:.55;cursor:wait}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:18px}
+h2{font:600 14px "IBM Plex Sans",sans-serif;margin:0 0 10px;color:var(--muted)}
+.rewrite{font-size:14px;color:var(--muted)} .rewrite b{color:var(--ink);font-weight:500}
+.answer{font:400 19px/1.65 "Newsreader",Georgia,serif;white-space:pre-wrap;max-width:68ch}
+sup.cite{color:var(--accent);font:600 12px "IBM Plex Sans",sans-serif;cursor:pointer;padding:0 1px}
+.badge{display:inline-block;border-radius:99px;padding:2px 12px;font-weight:600;font-size:13px;border:1.5px solid}
+.verified{color:var(--ok);border-color:var(--ok)}.partial{color:var(--warn);border-color:var(--warn)}.unsupported{color:var(--bad);border-color:var(--bad)}
+.bar{height:8px;background:#E3E9EF;border-radius:99px;overflow:hidden;margin:10px 0 14px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.claims{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.claims li{display:grid;grid-template-columns:110px 1fr;gap:10px;font-size:14px}
+.claims .s{font-weight:600}.claims .s.y{color:var(--ok)}.claims .s.n{color:var(--bad)}
+#diagram{overflow:auto;text-align:center}
+#diagram svg{max-width:100%;height:auto}
+.src{border-top:1px solid var(--line);padding:12px 0;font-size:13.5px}
+.src:first-of-type{border-top:0}
+.src:target,.src.hl{background:#F2F6FB}
+.src summary{cursor:pointer;font-weight:500}
+.src p{margin:8px 0 0;color:var(--muted)}
+.empty,.err{color:var(--muted)} .err{color:var(--bad)}
+.skeleton{color:var(--muted)}
+@media (max-width:760px){body{grid-template-columns:1fr}aside{padding:16px}.claims li{grid-template-columns:1fr;gap:2px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<aside>
+  <div><h1>Library Q&amp;A</h1><p>Answers come only from the files you add here.</p></div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add files">Drop PDF, EPUB, TXT or MD files here, or click to choose</div>
+  <input type="file" id="file" multiple accept=".pdf,.epub,.txt,.md" hidden>
+  <div id="upmsg" aria-live="polite"></div>
+  <ul id="docs"></ul>
+</aside>
+
+<main>
+  <div class="ask">
+    <textarea id="q" placeholder="Ask a question about your books and documents" aria-label="Question"></textarea>
+    <button class="go" id="go">Ask</button>
+  </div>
+  <div id="out"></div>
+</main>
+
+<script>
+mermaid.initialize({startOnLoad:false, securityLevel:"strict", theme:"neutral"});
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- library ---------- */
+async function loadDocs(){
+  const docs = await (await fetch("/api/documents")).json();
+  $("docs").innerHTML = docs.length ? docs.map(d =>
+    `<li><span class="n" title="${esc(d.source)}">${esc(d.source)}<br><small>${d.chunks} chunks</small></span>
+     <button data-h="${d.file_hash}" aria-label="Remove ${esc(d.source)}">Remove</button></li>`).join("")
+    : `<li class="empty">No files yet.</li>`;
+}
+$("docs").onclick = async e => {
+  const h = e.target.dataset.h; if(!h) return;
+  await fetch("/api/documents/"+h, {method:"DELETE"}); loadDocs();
+};
+async function upload(files){
+  if(!files.length) return;
+  $("upmsg").innerHTML = "Reading, checking and indexing…";
+  const fd = new FormData(); [...files].forEach(f => fd.append("files", f));
+  try{
+    const res = await (await fetch("/api/ingest", {method:"POST", body:fd})).json();
+    $("upmsg").innerHTML = res.map(r => r.ok
+      ? `<span class="ok">${esc(r.filename)}: added ${r.chunks} chunks</span>`
+      : `<span class="bad">${esc(r.filename)}: ${esc(r.error)}</span>`).join("");
+  }catch(err){ $("upmsg").innerHTML = `<span class="bad">Upload failed: ${esc(err.message)}</span>`; }
+  loadDocs();
+}
+$("drop").onclick = () => $("file").click();
+$("drop").onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("file").click(); } };
+$("file").onchange = e => { upload(e.target.files); e.target.value=""; };
+["dragover","dragenter"].forEach(t => $("drop").addEventListener(t, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave","drop"].forEach(t => $("drop").addEventListener(t, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => upload(e.dataTransfer.files));
+
+/* ---------- ask ---------- */
+async function ask(){
+  const text = $("q").value.trim(); if(text.length < 3) return;
+  $("go").disabled = true; $("go").textContent = "Working…";
+  $("out").innerHTML = `<section class="card skeleton">Cleaning the question, searching your library, checking the answer…</section>`;
+  try{
+    const r = await fetch("/api/ask", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({text})});
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.detail || "Request failed");
+    await render(data);
+  }catch(err){ $("out").innerHTML = `<section class="card err">${esc(err.message)}</section>`; }
+  $("go").disabled = false; $("go").textContent = "Ask";
+}
+$("go").onclick = ask;
+$("q").onkeydown = e => { if(e.key==="Enter" && (e.ctrlKey||e.metaKey)) ask(); };
+
+async function render(d){
+  let html = `<section class="card"><div class="rewrite">Searched for: <b>${esc(d.cleaned_question)}</b></div></section>`;
+  if(!d.found){
+    $("out").innerHTML = html + `<section class="card empty">Nothing in your library matches this question. Try different wording or add a relevant file.</section>`;
+    return;
+  }
+  const answer = esc(d.answer).replace(/\[(\d+)\]/g, '<sup class="cite" data-n="$1">[$1]</sup>');
+  html += `<section class="card"><h2>Answer</h2><div class="answer">${answer}</div></section>`;
+
+  const v = d.verification;
+  if(v){
+    const pct = Math.round((v.confidence||0)*100);
+    const label = {verified:"Verified", partial:"Partly supported", unsupported:"Not supported"}[v.verdict];
+    html += `<section class="card"><h2>Verification</h2>
+      <span class="badge ${v.verdict}">${label}</span> <span class="rewrite">&nbsp;${pct}% of claims found in your sources</span>
+      <div class="bar" role="img" aria-label="${pct}% supported"><i style="width:${pct}%"></i></div>
+      <ul class="claims">${(v.claims||[]).map(c => `<li>
+        <span class="s ${c.supported?"y":"n"}">${c.supported?"Supported":"Not supported"}${c.source?" ["+esc(c.source)+"]":""}</span>
+        <span>${esc(c.text)}</span></li>`).join("")}</ul>
+      ${v.notes?`<p class="rewrite">${esc(v.notes)}</p>`:""}</section>`;
+  }
+  if(d.diagram) html += `<section class="card"><h2>Diagram</h2><div id="diagram"></div></section>`;
+  html += `<section class="card"><h2>Sources</h2>${d.sources.map((s,i) =>
+    `<details class="src" id="src${i+1}"><summary>[${i+1}] ${esc(s.source)}, ${esc(s.location)}
+     <small class="rewrite">(match ${Math.round(s.similarity*100)}%)</small></summary><p>${esc(s.text)}</p></details>`).join("")}</section>`;
+  $("out").innerHTML = html;
+
+  if(d.diagram){
+    try{
+      const {svg} = await mermaid.render("d"+Date.now(), d.diagram);
+      $("diagram").innerHTML = svg;
+    }catch(e){
+      $("diagram").innerHTML = `<p class="rewrite">The diagram could not be drawn. Its source:</p><pre style="text-align:left;white-space:pre-wrap">${esc(d.diagram)}</pre>`;
+    }
+  }
+}
+$("out").onclick = e => {
+  const n = e.target.dataset?.n; if(!n) return;
+  const el = $("src"+n); if(el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"center"}); }
+};
+loadDocs();
+</script>
+</body>
+</html>
